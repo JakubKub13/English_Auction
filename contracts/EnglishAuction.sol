@@ -20,7 +20,7 @@ contract EnglishAuction {
     uint256 public highestBid;
     mapping(address => uint256) public bids;
 
-    event Start();
+    event Start(uint256 stated);
     event Bid(address indexed sender, uint256 amount);
     event Withdraw(address indexed bidder, uint256 amount);
     event End(address highestBidder, uint256 amount);
@@ -30,5 +30,28 @@ contract EnglishAuction {
         nftId = _nftId;
         seller = payable(msg.sender);
         highestBid = _startingBid;
+    }
+
+    function start(uint256 _timeInverval) external {
+        require(msg.sender == seller, "Auction: Not a seller");
+        require(!started, "Auction: Already started");
+        started = true;
+        endAt = uint32(block.timestamp + _timeInverval);
+        nft.transferFrom(seller, address(this), nftId);
+        emit Start(block.timestamp);
+    }
+
+    function bid() external payable {
+        require(started, "Auction: Has not started");
+        require(block.timestamp < endAt, "Auction: Has already ended");
+        require(msg.value > highestBid, "Auction: Value is less than highest Bid");
+
+        if(highestBidder != address(0)) {
+            bids[highestBidder] += highestBid;
+        }
+
+        highestBid = msg.value;
+        highestBidder = msg.sender;
+        emit Bid(msg.sender, msg.value);
     }
 }
