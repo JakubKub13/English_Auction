@@ -54,4 +54,12 @@ contract EnglishAuction {
         highestBidder = msg.sender;
         emit Bid(msg.sender, msg.value);
     }
+
+    function withdraw() external {
+        uint256 val = bids[msg.sender];
+        bids[msg.sender] = 0;
+        (bool success, ) = payable(msg.sender).call{value: val}("");
+        require(success, "Auction: Withdrawing Tx has failed");
+        emit Withdraw(msg.sender, val);
+    }
 }
