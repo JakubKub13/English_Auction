@@ -1,14 +1,2 @@
-# Sample Hardhat Project
-
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-```
-# English_Auction
+English Auction smart contract which allows any user to set up an auction for his/hers NFT and bidders can bid on the price as long as auction is active.
+When the time passes the nft is transferred to bidder who has made highest bid. 
