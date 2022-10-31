@@ -62,4 +62,19 @@ contract EnglishAuction {
         require(success, "Auction: Withdrawing Tx has failed");
         emit Withdraw(msg.sender, val);
     }
+
+    function end() external {
+        require(started, "Auction: Has not started");
+        require(!ended, "Auction: Was already ended");
+        require(block.timestamp >= endAt, "Auction: Can not be ended yet");
+        ended = true;
+        if (highestBidder != address(0)) {
+            nft.transferFrom(address(this), highestBidder, nftId);
+            (bool success, ) = seller.call{value: highestBid}("");
+            require(success, "Auction: TX to transfer highestBid to seller has failed");
+        } else {
+            nft.transferFrom(address(this), seller, nftId);
+        }
+        emit End(highestBidder, highestBid);
+    }
 }
