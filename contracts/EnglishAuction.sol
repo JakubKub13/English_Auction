@@ -1,13 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface IERC721 {
-    function transferFrom(
-        address from, 
-        address to,
-        uint256 nftId
-    ) external;
-}
+import {IERC721} from './interfaces/IERC721.sol';
 
 contract EnglishAuction {
     IERC721 public immutable nft;
@@ -32,9 +26,22 @@ contract EnglishAuction {
         highestBid = _startingBid;
     }
 
+    modifier onlySeller() {
+        require(msg.sender == seller, "Auction: Not a Seller");
+        _;
+    }
+
+    modifier notStarted() {
+        require(!started, "Auction: Has already started");
+        _;
+    }
+
+    modifier notEnded() {
+        require(!ended, "Auction: Has aleready ended");
+        _;
+    }
+
     function start(uint256 _timeInverval) external {
-        require(msg.sender == seller, "Auction: Not a seller");
-        require(!started, "Auction: Already started");
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
         nft.transferFrom(seller, address(this), nftId);
