@@ -14,7 +14,7 @@ contract EnglishAuction {
     uint256 public highestBid;
     mapping(address => uint256) public bids;
 
-    event Start(uint256 stated);
+    event Start(uint256 statedAt);
     event Bid(address indexed sender, uint256 amount);
     event Withdraw(address indexed bidder, uint256 amount);
     event End(address highestBidder, uint256 amount);
@@ -41,7 +41,7 @@ contract EnglishAuction {
         _;
     }
 
-    function start(uint256 _timeInverval) external {
+    function start(uint256 _timeInverval) external onlySeller notStarted {
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
         nft.transferFrom(seller, address(this), nftId);
