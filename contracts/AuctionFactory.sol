@@ -6,7 +6,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract AuctionFactory is Ownable {
     EnglishAuction[] public deployedAuctions;
-    uint256 private ownerFeePool;
+    uint256 public ownerFeePool;
     uint256 public immutable creationFee;
     
     event AuctionCreated(address Nft, uint256 NftId, uint256 StartingBid, address Seller);
@@ -18,6 +18,7 @@ contract AuctionFactory is Ownable {
 
     function createAuction(address _nft, uint256 _nftId, uint256 _startingBid, address _seller) public payable {
         require(msg.value == creationFee, "Factory: You have not provided required fee");
+        ownerFeePool += msg.value;
         EnglishAuction newAuction = new EnglishAuction(_nft, _nftId, _startingBid, _seller);
         deployedAuctions.push(newAuction);
         emit AuctionCreated(_nft, _nftId, _startingBid, _seller);
