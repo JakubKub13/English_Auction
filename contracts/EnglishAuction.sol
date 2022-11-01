@@ -19,11 +19,11 @@ contract EnglishAuction {
     event Withdraw(address indexed bidder, uint256 amount);
     event End(address highestBidder, uint256 amount);
 
-    constructor(address _nft, uint256 _nftId, uint256 _startingBid) {
+    constructor(address _nft, uint256 _nftId, uint256 _startingBid, address _seller) {
         nft = IERC721(_nft);
         nftId = _nftId;
-        seller = payable(msg.sender);
         highestBid = _startingBid;
+        seller = payable(_seller);
     }
 
     modifier onlySeller() {
@@ -41,6 +41,11 @@ contract EnglishAuction {
         _;
     }
 
+    modifier onlyWhenStarted() {
+        require(started, "Auction: Is not started yet");
+        _;
+    }
+
     function start(uint256 _timeInverval) external onlySeller notStarted {
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
@@ -48,8 +53,7 @@ contract EnglishAuction {
         emit Start(block.timestamp);
     }
 
-    function bid() external payable {
-        require(started, "Auction: Has not started");
+    function bid() external payable onlyWhenStarted {
         require(block.timestamp < endAt, "Auction: Has already ended");
         require(msg.value > highestBid, "Auction: Value is less than highest Bid");
 
@@ -64,15 +68,14 @@ contract EnglishAuction {
 
     function withdraw() external {
         uint256 val = bids[msg.sender];
+        require(val > 0, "Auction: User does not bid any value / Can not withdraw 0");
         bids[msg.sender] = 0;
         (bool success, ) = payable(msg.sender).call{value: val}("");
         require(success, "Auction: Withdrawing Tx has failed");
         emit Withdraw(msg.sender, val);
     }
 
-    function end() external {
-        require(started, "Auction: Has not started");
-        require(!ended, "Auction: Was already ended");
+    function end() external onlyWhenStarted notEnded {
         require(block.timestamp >= endAt, "Auction: Can not be ended yet");
         ended = true;
         if (highestBidder != address(0)) {

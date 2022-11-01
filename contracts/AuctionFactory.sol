@@ -21,6 +21,7 @@ contract AuctionFactory {
 
     function createAuction(address _nft, uint256 _nftId, uint256 _startingBid, address _seller) public payable {
         require(msg.value == creationFee, "Factory: You have not provided required fee");
+        EnglishAuction newAuction = 
 
     }
 
