@@ -16,10 +16,10 @@ contract AuctionFactory is Ownable {
         creationFee = _creationFee;
     }
 
-    function createAuction(address _nft, uint256 _nftId, uint256 _startingBid, address _seller) public payable {
+    function createAuction(address _nft, uint256 _nftId, uint256 _startingBid, address _seller, address _auctionToken) public payable {
         require(msg.value == creationFee, "Factory: You have not provided required fee");
         ownerFeePool += msg.value;
-        EnglishAuction newAuction = new EnglishAuction(_nft, _nftId, _startingBid, _seller);
+        EnglishAuction newAuction = new EnglishAuction(_nft, _nftId, _startingBid, _seller, _auctionToken);
         deployedAuctions.push(newAuction);
         emit AuctionCreated(_nft, _nftId, _startingBid, _seller);
     }

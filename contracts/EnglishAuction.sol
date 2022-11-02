@@ -17,17 +17,20 @@ contract EnglishAuction {
     address public highestBidder;
     uint256 public highestBid;
     mapping(address => uint256) public bids;
+    IERC20 public immutable auctionToken;
 
     event Start(uint256 statedAt);
     event Bid(address indexed sender, uint256 amount);
     event Withdraw(address indexed bidder, uint256 amount);
     event End(address highestBidder, uint256 amount);
 
-    constructor(address _nft, uint256 _nftId, uint256 _startingBid, address _seller) {
+    constructor(address _nft, uint256 _nftId, uint256 _startingBid, address _seller, address _auctionToken) {
         nft = IERC721(_nft);
         nftId = _nftId;
         highestBid = _startingBid;
         seller = payable(_seller);
+        auctionToken = IERC20(_auctionToken);
+
     }
 
     modifier onlySeller() {
