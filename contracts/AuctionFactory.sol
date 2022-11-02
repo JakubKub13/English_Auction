@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import {EnglishAuction} from "./EnglishAuction.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {AuctionToken} from "./AuctionToken.sol";
 
 contract AuctionFactory is Ownable {
     EnglishAuction[] public deployedAuctions;
