@@ -30,7 +30,6 @@ contract EnglishAuction {
         highestBid = _startingBid;
         seller = payable(_seller);
         auctionToken = IERC20(_auctionToken);
-
     }
 
     modifier onlySeller() {
@@ -60,25 +59,26 @@ contract EnglishAuction {
         emit Start(block.timestamp);
     }
 
-    function bid() external payable onlyWhenStarted {
+    function bid(uint256 _bidAmount) external onlyWhenStarted {
         require(block.timestamp < endAt, "Auction: Has already ended");
-        require(msg.value > highestBid, "Auction: Value is less than highest Bid");
+        require(_bidAmount > highestBid, "Auction: Value is less than highest Bid");
 
         if(highestBidder != address(0)) {
             bids[highestBidder] += highestBid;
         }
 
-        highestBid = msg.value;
+        highestBid = _bidAmount;
         highestBidder = msg.sender;
-        emit Bid(msg.sender, msg.value);
+        auctionToken.safeApprove(address(this), _bidAmount);
+        auctionToken.safeTransferFrom(msg.sender, address(this), _bidAmount);
+        emit Bid(msg.sender, _bidAmount);
     }
 
     function withdraw() external {
         uint256 val = bids[msg.sender];
         require(val > 0, "Auction: User does not bid any value / Can not withdraw 0");
         bids[msg.sender] = 0;
-        (bool success, ) = payable(msg.sender).call{value: val}("");
-        require(success, "Auction: Withdrawing Tx has failed");
+        auctionToken.safeTransfer(msg.sender, val);
         emit Withdraw(msg.sender, val);
     }
 
