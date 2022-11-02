@@ -7,4 +7,9 @@ interface IERC721 {
         address to,
         uint256 nftId
     ) external;
+
+    function approve(
+        address to,
+        uint256 tokenId
+    ) external;
 }

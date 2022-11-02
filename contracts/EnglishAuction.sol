@@ -55,6 +55,7 @@ contract EnglishAuction {
     function start(uint256 _timeInverval) external onlySeller notStarted {
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
+        nft.approve(address(this), _nftId)
         nft.transferFrom(seller, address(this), nftId);
         emit Start(block.timestamp);
     }
