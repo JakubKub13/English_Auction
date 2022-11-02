@@ -2,8 +2,12 @@
 pragma solidity 0.8.17;
 
 import {IERC721} from './interfaces/IERC721.sol';
+import {IERC20} from '@openzeppelin/contracts/interfaces/IERC20.sol';
+import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 
 contract EnglishAuction {
+    using SafeERC20 for IERC20;
+
     IERC721 public immutable nft;
     uint256 public immutable nftId;
     address payable public immutable seller;
