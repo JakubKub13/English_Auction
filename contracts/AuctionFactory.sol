@@ -9,7 +9,7 @@ contract AuctionFactory is Ownable {
     uint256 public ownerFeePool;
     uint256 public immutable creationFee;
     
-    event AuctionCreated(address Nft, uint256 NftId, uint256 StartingBid, address Seller);
+    event AuctionCreated(address Nft, uint256 NftId, uint256 StartingBid, address Seller, address chosenAuctionToken);
     event FeeWithdrawal(address to, uint256 amount, uint256 time);
  
     constructor(uint256 _creationFee) {
@@ -21,7 +21,7 @@ contract AuctionFactory is Ownable {
         ownerFeePool += msg.value;
         EnglishAuction newAuction = new EnglishAuction(_nft, _nftId, _startingBid, _seller, _auctionToken);
         deployedAuctions.push(newAuction);
-        emit AuctionCreated(_nft, _nftId, _startingBid, _seller);
+        emit AuctionCreated(_nft, _nftId, _startingBid, _seller, _auctionToken);
     }
 
     function ownerFeeWithdraw(address _to, uint256 _amount) public onlyOwner {

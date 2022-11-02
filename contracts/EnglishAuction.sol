@@ -55,7 +55,7 @@ contract EnglishAuction {
     function start(uint256 _timeInverval) external onlySeller notStarted {
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
-        nft.approve(address(this), _nftId)
+        nft.approve(address(this), nftId);
         nft.transferFrom(seller, address(this), nftId);
         emit Start(block.timestamp);
     }
@@ -88,8 +88,7 @@ contract EnglishAuction {
         ended = true;
         if (highestBidder != address(0)) {
             nft.transferFrom(address(this), highestBidder, nftId);
-            (bool success, ) = seller.call{value: highestBid}("");
-            require(success, "Auction: TX to transfer highestBid to seller has failed");
+            auctionToken.safeTransfer(seller, highestBid);
         } else {
             nft.transferFrom(address(this), seller, nftId);
         }
