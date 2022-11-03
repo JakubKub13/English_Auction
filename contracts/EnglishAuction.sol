@@ -10,7 +10,7 @@ contract EnglishAuction {
 
     IERC721 public immutable nft;
     uint256 public immutable nftId;
-    address payable public immutable seller;
+    address public immutable seller;
     uint32 public endAt;
     bool public started;
     bool public ended;
@@ -28,7 +28,7 @@ contract EnglishAuction {
         nft = IERC721(_nft);
         nftId = _nftId;
         highestBid = _startingBid;
-        seller = payable(_seller);
+        seller = _seller;
         auctionToken = IERC20(_auctionToken);
     }
 
