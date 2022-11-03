@@ -112,6 +112,18 @@ describe("English Auction for tokenized carbon credits", function () {
             const startingBid = ethers.utils.formatEther(startingBidBn);
             expect(startingBid).to.eq("100.0");
             expect(await auctionImplementation.auctionToken()).to.eq(mDAI.address)
-        })
-    })
+        });
+
+        it("Seller can not bid on his own NFT", async () => {
+            const bidAmountSeller = 150;
+            const approveTx = await nft.connect(seller).approve(auctionImplementation.address, 0);
+            const startTx = await auctionImplementation.connect(seller).start(10);
+            await expect(auctionImplementation.connect(seller).bid(ethers.utils.parseEther(bidAmountSeller.toFixed(18)))).to.be.revertedWith("Auction: Seller excluded from bidding");
+        });
+
+        it("Should not be able to bid when Auction is not started yet", async () => {
+            const bidAmount1 = 150;
+            await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidAmount1.toFixed(18)))).to.be.revertedWith("Auction: Is not started yet");
+        });
+    });
 });
