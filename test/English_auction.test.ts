@@ -117,13 +117,28 @@ describe("English Auction for tokenized carbon credits", function () {
         it("Seller can not bid on his own NFT", async () => {
             const bidAmountSeller = 150;
             const approveTx = await nft.connect(seller).approve(auctionImplementation.address, 0);
+            await approveTx.wait();
             const startTx = await auctionImplementation.connect(seller).start(10);
+            await startTx.wait();
             await expect(auctionImplementation.connect(seller).bid(ethers.utils.parseEther(bidAmountSeller.toFixed(18)))).to.be.revertedWith("Auction: Seller excluded from bidding");
         });
 
         it("Should not be able to bid when Auction is not started yet", async () => {
             const bidAmount1 = 150;
             await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidAmount1.toFixed(18)))).to.be.revertedWith("Auction: Is not started yet");
+        });
+
+        it("User must approve auction implementation before bid", async () => {
+            const bidAmount1 = 150;
+            const approveTx = await nft.connect(seller).approve(auctionImplementation.address, 0);
+            await approveTx.wait();
+            const startTx = await auctionImplementation.connect(seller).start(10);
+            await startTx.wait();
+            const balance1 = await mDAI.balanceOf(bidder1.address);
+            await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidAmount1.toFixed(18)))).to.be.revertedWith("ERC20: insufficient allowance");
+            const approveTx1 = await mDAI.approve(auctionImplementation.address, balance1);
+            await approveTx1.wait();
+            await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidAmount1.toFixed(18)))).to.be.ok;
         });
     });
 });
