@@ -1,11 +1,12 @@
 import { expect } from "chai";
 import { ethers, network } from "hardhat";
-import { AuctionFactory, EnglishAuction, MockDAI, NFTAuction } from "../typechain-types";
+import { AuctionFactory, AuctionFactory__factory, EnglishAuction, MockDAI, NFTAuction } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 const FACTORY_FEE_FOR_CREATING_AUCTION = 0.1  // ETH in this case
 const DAI_AMOUNT_TO_MINT = 1000;
 const STARTING_BID = 100; // 100 DAI
+
 
 describe("English Auction for tokenized carbon credits", function () {
     let mDAI: MockDAI;
@@ -94,9 +95,23 @@ describe("English Auction for tokenized carbon credits", function () {
                 0,
                 ethers.utils.parseEther(STARTING_BID.toFixed(18)),
                 seller.address,
-                mDAI.address
-            );
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )
             await auctionCreationTx.wait();
+            const addressAuction = await auctionFactory.deployedAuctions(0);
+            const auctionImplementFactory = await ethers.getContractFactory("EnglishAuction");
+            auctionImplementation = auctionImplementFactory.attach(addressAuction)
         });
+
+        it("Should create Auction implementation and deploy it", async() => {
+            expect(await auctionImplementation.seller()).to.eq(seller.address);
+            expect(await auctionImplementation.nft()).to.eq(nft.address);
+            expect(await auctionImplementation.nftId()).to.eq(0);
+            const startingBidBn = await auctionImplementation.highestBid();
+            const startingBid = ethers.utils.formatEther(startingBidBn);
+            expect(startingBid).to.eq("100.0");
+            expect(await auctionImplementation.auctionToken()).to.eq(mDAI.address)
+        })
     })
 });
