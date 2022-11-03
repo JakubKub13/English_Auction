@@ -5,6 +5,7 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 const FACTORY_FEE_FOR_CREATING_AUCTION = 0.1  // ETH in this case
 const DAI_AMOUNT_TO_MINT = 1000;
+const STARTING_BID = 100; // 100 DAI
 
 describe("English Auction for tokenized carbon credits", function () {
     let mDAI: MockDAI;
@@ -58,6 +59,7 @@ describe("English Auction for tokenized carbon credits", function () {
             const tx2 = await mDAI.mint(bidder2.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
             await tx2.wait();
             const tx3 = await mDAI.mint(bidder3.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx3.wait();
             const nftTX = await nft.safeMint(seller.address, "ipfs://carbon_certificate");
             await nftTX.wait();
         });
@@ -74,7 +76,27 @@ describe("English Auction for tokenized carbon credits", function () {
         it("Should mint 1 NFT Certificate to seller", async () => {
             const ownerOfTokenId = await nft.ownerOf(0);
             expect(ownerOfTokenId).to.eq(seller.address);
-        })
-        
+        });
+    });
+
+    describe("Seller can create his own customizable auction for Carbon certificate he owns", function () {
+        beforeEach(async () => {
+            const tx1 = await mDAI.mint(bidder1.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx1.wait();
+            const tx2 = await mDAI.mint(bidder2.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx2.wait();
+            const tx3 = await mDAI.mint(bidder3.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx3.wait();
+            const nftTX = await nft.safeMint(seller.address, "ipfs://carbon_certificate");
+            await nftTX.wait();
+            const auctionCreationTx = await auctionFactory.connect(seller).createAuction(
+                nft.address,
+                0,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                seller.address,
+                mDAI.address
+            );
+            await auctionCreationTx.wait();
+        });
     })
 });
