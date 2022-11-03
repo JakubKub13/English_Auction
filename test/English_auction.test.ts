@@ -3,6 +3,8 @@ import { ethers, network } from "hardhat";
 import { AuctionFactory, EnglishAuction, MockDAI, NFTAuction } from "../typechain-types";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
+const FACTORY_FEE_FOR_CREATING_AUCTION = 0.1  // ETH in this case
+
 describe("English Auction for tokenized carbon credits", function () {
     let mDAI: MockDAI;
     let nft: NFTAuction;
@@ -22,7 +24,11 @@ describe("English Auction for tokenized carbon credits", function () {
         const auctionImplementFactory = await ethers.getContractFactory("EnglishAuction");
         mDAI = await mDAIFactory.deploy();
         await mDAI.deployed();
-
-
-    })
+        nft = await nftFactory.deploy();
+        await nft.deployed();
+        auctionFactory = await auctionFactoryFactory.deploy(
+            ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18)) 
+        ) as AuctionFactory;
+        await auctionFactory.deployed();
+    });
 });
