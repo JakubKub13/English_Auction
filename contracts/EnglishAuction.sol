@@ -60,6 +60,7 @@ contract EnglishAuction {
     }
 
     function bid(uint256 _bidAmount) external onlyWhenStarted {
+        require(msg.sender != seller, "Auction: Seller excluded from bidding");
         require(block.timestamp < endAt, "Auction: Has already ended");
         require(_bidAmount > highestBid, "Auction: Value is less than highest Bid");
 
