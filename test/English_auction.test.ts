@@ -31,4 +31,27 @@ describe("English Auction for tokenized carbon credits", function () {
         ) as AuctionFactory;
         await auctionFactory.deployed();
     });
+
+    describe("Testing correct initialization", function () {
+        it("Should deploy mDAI", async () => {
+            const addressDAI = mDAI.address;
+            console.log(`Address of deployed DAI token is ${addressDAI}`);
+            expect(await mDAI.symbol()).to.eq("mDAI");
+        });
+
+        it("Should deploy NFT", async () => {
+            const addressNFT = nft.address;
+            console.log(`Address of deployed NFT is ${addressNFT}`);
+            expect(await nft.name()).to.eq("NFTauction");
+        });
+
+        it("Should deploy AuctionFactory", async () => {
+            const addressAucFact = auctionFactory.address;
+            const auctionCreationFee = await auctionFactory.creationFee();
+            console.log(`Address of deployed Auction Factory is ${addressAucFact}`);
+            expect(ethers.utils.formatEther(auctionCreationFee)).to.eq("0.100000000000000006");
+        });
+
+
+    });
 });
