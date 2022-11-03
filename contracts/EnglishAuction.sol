@@ -55,7 +55,6 @@ contract EnglishAuction {
     function start(uint256 _timeInverval) external onlySeller notStarted {
         started = true;
         endAt = uint32(block.timestamp + _timeInverval);
-        nft.approve(address(this), nftId);
         nft.transferFrom(seller, address(this), nftId);
         emit Start(block.timestamp);
     }
@@ -70,7 +69,6 @@ contract EnglishAuction {
 
         highestBid = _bidAmount;
         highestBidder = msg.sender;
-        auctionToken.safeApprove(address(this), _bidAmount);
         auctionToken.safeTransferFrom(msg.sender, address(this), _bidAmount);
         emit Bid(msg.sender, _bidAmount);
     }
