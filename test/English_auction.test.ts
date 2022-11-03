@@ -4,6 +4,7 @@ import { AuctionFactory, EnglishAuction, MockDAI, NFTAuction } from "../typechai
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 const FACTORY_FEE_FOR_CREATING_AUCTION = 0.1  // ETH in this case
+const DAI_AMOUNT_TO_MINT = 1000;
 
 describe("English Auction for tokenized carbon credits", function () {
     let mDAI: MockDAI;
@@ -51,7 +52,27 @@ describe("English Auction for tokenized carbon credits", function () {
             console.log(`Address of deployed Auction Factory is ${addressAucFact}`);
             expect(ethers.utils.formatEther(auctionCreationFee)).to.eq("0.100000000000000006");
         });
-
-
     });
+
+    describe("Minting NFT to seller and initial supply of DAI for bidders", function () {
+        beforeEach(async () => {
+            const tx1 = await mDAI.mint(bidder1.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx1.wait();
+            const tx2 = await mDAI.mint(bidder2.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx2.wait();
+            const tx3 = await mDAI.mint(bidder3.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            const nftTX = await nft.safeMint(seller.address, "ipfs://carbon_certificate");
+            await nftTX.wait();
+        });
+
+        it("Should fund bidders with init DAI supply", async () => {
+            const bidder1Bal = await mDAI.balanceOf(bidder1.address);
+            const bidder2Bal = await mDAI.balanceOf(bidder2.address);
+            const bidder3Bal = await mDAI.balanceOf(bidder3.address);
+            expect(ethers.utils.formatEther(bidder1Bal)).to.eq("1000.0");
+            expect(ethers.utils.formatEther(bidder2Bal)).to.eq("1000.0");
+            expect(ethers.utils.formatEther(bidder3Bal)).to.eq("1000.0");
+        });
+        
+    })
 });
