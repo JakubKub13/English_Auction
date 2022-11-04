@@ -13,6 +13,7 @@ describe("English Auction for tokenized carbon credits", function () {
     let nft: NFTAuction;
     let auctionFactory: AuctionFactory;
     let auctionImplementation: EnglishAuction;
+    let auctionImplementation2: EnglishAuction;
     let owner: SignerWithAddress;
     let seller: SignerWithAddress;
     let bidder1: SignerWithAddress;
@@ -355,6 +356,33 @@ describe("English Auction for tokenized carbon credits", function () {
                 mDAI.address,
                 {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
             )).to.emit(auctionFactory, "AuctionCreated");
+        });
+        
+        it("Should not be able for user to create new Auction implementation when he has already created and started one", async () => {
+            const nftTX = await nft.safeMint(bidder1.address, "ipfs://carbon_certificate2");
+            await nftTX.wait();
+            expect(await nft.ownerOf(1)).to.eq(bidder1.address);
+
+            const createAutTx = await auctionFactory.connect(bidder1).createAuction(nft.address, 1, ethers.utils.parseEther(STARTING_BID.toFixed(18)), bidder1.address, mDAI.address, {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))});
+            await createAutTx.wait();
+
+            const addressAuction1 = await auctionFactory.deployedAuctions(1);
+            const auctionImplementFactory = await ethers.getContractFactory("EnglishAuction");
+            auctionImplementation = auctionImplementFactory.attach(addressAuction1);
+
+            const approveTx = await nft.connect(bidder1).approve(auctionImplementation.address, 1);
+            await approveTx.wait();
+            const startTx = await auctionImplementation.connect(bidder1).start(120);
+            await startTx.wait();
+
+            const createAutTx2 = await auctionFactory.connect(bidder1).createAuction(nft.address, 1, ethers.utils.parseEther(STARTING_BID.toFixed(18)), bidder1.address, mDAI.address, {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))});
+            await createAutTx2.wait();
+
+            const addressAuction2 = await auctionFactory.deployedAuctions(2);
+            const auctionImplementFactory2 = await ethers.getContractFactory("EnglishAuction");
+            auctionImplementation2 = auctionImplementFactory2.attach(addressAuction2);
+
+            await expect(nft.connect(bidder1).approve(auctionImplementation2.address, 1)).to.be.revertedWith("ERC721: approve caller is not token owner nor approved for all");
         });
 
         it("Should be able for Owner to withdraw owner fees from Pool", async () => {
