@@ -136,8 +136,6 @@ describe("English Auction for tokenized carbon credits", function () {
             await startTx.wait();
             const balance1 = await mDAI.balanceOf(bidder1.address);
             await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidAmount1.toFixed(18)))).to.be.revertedWith("ERC20: insufficient allowance");
-            // const approveTx1 = await mDAI.approve(auctionImplementation.address, balance1);
-            // await approveTx1.wait();
         });
     });
 
