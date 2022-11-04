@@ -188,5 +188,45 @@ describe("English Auction for tokenized carbon credits", function () {
             await bidTx2.wait();
             await bidTx3.wait();
         });
+
+        it("Bids should not be ended before time has passed", async () => {
+
+        });
+
+        it("Should be able to end the auction after time has passed", async () => {
+
+        });
+
+        it("Highest bidder in your case should be bidder 3", async () => {
+
+        });
+
+        it("Highest bid should be in our case 350", async () => {
+
+        });
+
+        it("Not highest bidders can withdraw and re-bid if want to", async () => {
+
+        });
+
+        it("Should transfer NFT carbon certificate to the highest bidder", async () => {
+
+        });
+
+        it("Should transfer funds to the seller of the NFT carbon certificate", async () => {
+
+        });
+
+        it("Owner of the Auction factory should be able to withdraw ETH from fee pool", async () => {
+
+        });
     });
+
+    describe("Creating Multiple implementations of Auctions with different parameters", function () {
+        beforeEach(async () => {
+
+        });
+    })
+
+
 });
