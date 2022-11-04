@@ -190,10 +190,13 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Bids should not be ended before time has passed", async () => {
-
+            await expect(auctionImplementation.end()).to.be.revertedWith("Auction: Can not be ended yet");
         });
 
         it("Should be able to end the auction after time has passed", async () => {
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            await expect(auctionImplementation.connect(bidder2).end()).to.emit(auctionImplementation, "End")
 
         });
 
