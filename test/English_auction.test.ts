@@ -257,12 +257,91 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Owner of the Auction factory should be able to withdraw ETH from fee pool", async () => {
-
+            const balanceOfOwnerBeforeBn = await ethers.provider.getBalance(owner.address);
+            const balanceOfOwnerBefore = ethers.utils.formatEther(balanceOfOwnerBeforeBn);
+            console.log(`Balance of Owner of the Auction factory before was: ${balanceOfOwnerBefore} ETH`); 
+            const ownerWithdrawTx1 = await auctionFactory.ownerFeeWithdraw(owner.address, await auctionFactory.ownerFeePool());
+            await ownerWithdrawTx1.wait();
+            const balanceOfOwnerAfterBn = await ethers.provider.getBalance(owner.address);
+            const balanceOfOwnerAfter = ethers.utils.formatEther(balanceOfOwnerAfterBn);
+            console.log(`Balance of Owner of the Auction factory after is: ${balanceOfOwnerAfter} ETH`);
         });
     });
 
     describe("Creating Multiple implementations of Auctions with different parameters", function () {
         beforeEach(async () => {
+            const tx1 = await mDAI.mint(bidder1.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx1.wait();
+            const tx2 = await mDAI.mint(bidder2.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx2.wait();
+            const tx3 = await mDAI.mint(bidder3.address, ethers.utils.parseEther(DAI_AMOUNT_TO_MINT.toFixed(18)));
+            await tx3.wait();
+            const nftTX = await nft.safeMint(seller.address, "ipfs://carbon_certificate");
+            await nftTX.wait();
+            const auctionCreationTx = await auctionFactory.connect(seller).createAuction(
+                nft.address,
+                0,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                seller.address,
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )
+            await auctionCreationTx.wait();
+            const addressAuction = await auctionFactory.deployedAuctions(0);
+            const auctionImplementFactory = await ethers.getContractFactory("EnglishAuction");
+            auctionImplementation = auctionImplementFactory.attach(addressAuction);
+
+            const bidder1Amount = "150";
+            const bidder2Amount = "250";
+            const bidder3Amount = "350";
+            const bidder1NewAmount = "550";
+            
+            const approveTx = await nft.connect(seller).approve(auctionImplementation.address, 0);
+            await approveTx.wait();
+            const startTx = await auctionImplementation.connect(seller).start(120);
+            await startTx.wait();
+
+            const approveTx1 = await mDAI.connect(bidder1).approve(auctionImplementation.address, ethers.utils.parseEther("1000"));
+            const approveTx2 = await mDAI.connect(bidder2).approve(auctionImplementation.address, ethers.utils.parseEther(bidder2Amount));
+            const approveTx3 = await mDAI.connect(bidder3).approve(auctionImplementation.address, ethers.utils.parseEther(bidder3Amount));
+            await approveTx1.wait();
+            await approveTx2.wait();
+            await approveTx3.wait();
+
+            const bidTx1 = await auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidder1Amount));
+            const bidTx2 = await auctionImplementation.connect(bidder2).bid(ethers.utils.parseEther(bidder2Amount));
+            const bidTx3 = await auctionImplementation.connect(bidder3).bid(ethers.utils.parseEther(bidder3Amount));
+            await bidTx1.wait();
+            await bidTx2.wait();
+            await bidTx3.wait();
+
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+        });
+
+        it("Should not be possible to bid on ended Auction", async () => {
+
+        });
+
+        it("Should not be possible to start again already ended Auction", async () => {
+
+        });
+
+        it("Should be able to start again 2 new Auctions", async () => {
+
+        });
+
+        it("Should be able for Owner to withdraw owner fees from Pool", async () => {
+
+        });
+
+        it("Shopuld be able to start new auctions", async () => {
+
+        });
+
+        it("Should be able to bid on new auctions", async () => {
 
         });
     })
