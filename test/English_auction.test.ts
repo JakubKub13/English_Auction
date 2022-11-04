@@ -333,14 +333,37 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Should be able to start again 2 new Auctions", async () => {
+            const nftTX = await nft.safeMint(bidder1.address, "ipfs://carbon_certificate2");
+            const nftTX1 = await nft.safeMint(bidder2.address, "ipfs://carbon_certificate3");
+            await nftTX.wait();
+            await nftTX1.wait();
+            expect(await nft.ownerOf(1)).to.eq(bidder1.address);
+            expect(await nft.ownerOf(2)).to.eq(bidder2.address);
 
+            await expect(auctionFactory.connect(bidder1).createAuction(
+                nft.address,
+                1,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                bidder1.address,
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )).to.emit(auctionFactory, "AuctionCreated");
+            
+            await expect(auctionFactory.connect(bidder2).createAuction(
+                nft.address,
+                1,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                bidder2.address,
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )).to.emit(auctionFactory, "AuctionCreated");
         });
 
         it("Should be able for Owner to withdraw owner fees from Pool", async () => {
 
         });
 
-        it("Shopuld be able to start new auctions", async () => {
+        it("Should be able to start new auctions", async () => {
 
         });
 
