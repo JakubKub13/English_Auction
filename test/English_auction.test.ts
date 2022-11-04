@@ -386,17 +386,75 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Should be able for Owner to withdraw owner fees from Pool", async () => {
+            const nftTX = await nft.safeMint(bidder1.address, "ipfs://carbon_certificate2");
+            const nftTX1 = await nft.safeMint(bidder2.address, "ipfs://carbon_certificate3");
+            await nftTX.wait();
+            await nftTX1.wait();
+            expect(await nft.ownerOf(1)).to.eq(bidder1.address);
+            expect(await nft.ownerOf(2)).to.eq(bidder2.address);
 
-        });
+            await expect(auctionFactory.connect(bidder1).createAuction(
+                nft.address,
+                1,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                bidder1.address,
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )).to.emit(auctionFactory, "AuctionCreated");
+            
+            await expect(auctionFactory.connect(bidder2).createAuction(
+                nft.address,
+                1,
+                ethers.utils.parseEther(STARTING_BID.toFixed(18)),
+                bidder2.address,
+                mDAI.address,
+                {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))}
+            )).to.emit(auctionFactory, "AuctionCreated");
 
-        it("Should be able to start new auctions", async () => {
-
+            const balanceOfOwnerBeforeBn = await ethers.provider.getBalance(owner.address);
+            const balanceOfOwnerBefore = ethers.utils.formatEther(balanceOfOwnerBeforeBn);
+            console.log(`Balance of Owner of the Auction factory before was: ${balanceOfOwnerBefore} ETH`); 
+            const ownerWithdrawTx1 = await auctionFactory.ownerFeeWithdraw(owner.address, await auctionFactory.ownerFeePool());
+            await ownerWithdrawTx1.wait();
+            const balanceOfOwnerAfterBn = await ethers.provider.getBalance(owner.address);
+            const balanceOfOwnerAfter = ethers.utils.formatEther(balanceOfOwnerAfterBn);
+            console.log(`Balance of Owner of the Auction factory after is: ${balanceOfOwnerAfter} ETH`);
         });
 
         it("Should be able to bid on new auctions", async () => {
+            const bidder2BidAmount = "300";
+            const bidder3BidAmount = "600";
+            const nftTX = await nft.safeMint(bidder1.address, "ipfs://carbon_certificate2");
+            await nftTX.wait();
+            expect(await nft.ownerOf(1)).to.eq(bidder1.address);
 
+            const createAutTx = await auctionFactory.connect(bidder1).createAuction(nft.address, 1, ethers.utils.parseEther(STARTING_BID.toFixed(18)), bidder1.address, mDAI.address, {value: ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))});
+            await createAutTx.wait();
+
+            const addressAuction1 = await auctionFactory.deployedAuctions(1);
+            const auctionImplementFactory = await ethers.getContractFactory("EnglishAuction");
+            auctionImplementation = auctionImplementFactory.attach(addressAuction1);
+
+            const approveTx = await nft.connect(bidder1).approve(auctionImplementation.address, 1);
+            await approveTx.wait();
+            const startTx = await auctionImplementation.connect(bidder1).start(120);
+            await startTx.wait();
+
+            const approveTx2 = await mDAI.connect(bidder2).approve(auctionImplementation.address, ethers.utils.parseEther(bidder2BidAmount));
+            const approveTx3 = await mDAI.connect(bidder3).approve(auctionImplementation.address, ethers.utils.parseEther(bidder3BidAmount));
+            await approveTx2.wait();
+            await approveTx3.wait();
+
+
+            const bidTx1 = await auctionImplementation.connect(bidder2).bid(ethers.utils.parseEther(bidder2BidAmount));
+            const bidTx2 = await auctionImplementation.connect(bidder3).bid(ethers.utils.parseEther(bidder3BidAmount));
+            await bidTx1.wait();
+            await bidTx2.wait();
+            const highestBidBn = await auctionImplementation.highestBid();
+            const highestBid = ethers.utils.formatEther(highestBidBn);
+            
+            expect(await auctionImplementation.highestBidder()).to.eq(bidder3.address);
+            expect(highestBid).to.eq("600.0");
         });
-    })
-
-
+    });
 });
