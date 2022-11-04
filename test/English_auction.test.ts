@@ -322,11 +322,14 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Should not be possible to bid on ended Auction", async () => {
-
+            const bidder1NewAmount = "550";
+            await expect(auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidder1NewAmount))).to.be.revertedWith("Auction: Has already ended")
         });
 
         it("Should not be possible to start again already ended Auction", async () => {
-
+            const ended = await auctionImplementation.ended();
+            await expect(auctionImplementation.connect(seller).start(130)).to.be.revertedWith("Auction: Has already started");
+            expect(ended).to.eq(true);
         });
 
         it("Should be able to start again 2 new Auctions", async () => {
