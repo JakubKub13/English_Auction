@@ -245,7 +245,15 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Should transfer funds to the seller of the NFT carbon certificate", async () => {
-
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+            const balanceSellerAfterBn = await mDAI.balanceOf(seller.address);
+            const balanceSellerAfter = ethers.utils.formatEther(balanceSellerAfterBn);
+            const highestBidBn = await auctionImplementation.highestBid();
+            const highestBid = ethers.utils.formatEther(highestBidBn);
+            expect(balanceSellerAfter).to.eq(highestBid);
         });
 
         it("Owner of the Auction factory should be able to withdraw ETH from fee pool", async () => {
