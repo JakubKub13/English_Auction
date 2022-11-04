@@ -168,13 +168,13 @@ describe("English Auction for tokenized carbon credits", function () {
             const bidder2Amount = "250";
             const bidder3Amount = "350";
             const bidder1NewAmount = "550";
-
+            
             const approveTx = await nft.connect(seller).approve(auctionImplementation.address, 0);
             await approveTx.wait();
             const startTx = await auctionImplementation.connect(seller).start(120);
             await startTx.wait();
 
-            const approveTx1 = await mDAI.connect(bidder1).approve(auctionImplementation.address, ethers.utils.parseEther(bidder1NewAmount));
+            const approveTx1 = await mDAI.connect(bidder1).approve(auctionImplementation.address, ethers.utils.parseEther("1000"));
             const approveTx2 = await mDAI.connect(bidder2).approve(auctionImplementation.address, ethers.utils.parseEther(bidder2Amount));
             const approveTx3 = await mDAI.connect(bidder3).approve(auctionImplementation.address, ethers.utils.parseEther(bidder3Amount));
             await approveTx1.wait();
@@ -193,23 +193,45 @@ describe("English Auction for tokenized carbon credits", function () {
             await expect(auctionImplementation.end()).to.be.revertedWith("Auction: Can not be ended yet");
         });
 
-        it("Should be able to end the auction after time has passed", async () => {
+        it("Anyone should be able to end the auction after time has passed", async () => {
             await network.provider.send("evm_increaseTime", [130]);
             await network.provider.send("evm_mine");
-            await expect(auctionImplementation.connect(bidder2).end()).to.emit(auctionImplementation, "End")
-
+            await expect(auctionImplementation.connect(bidder2).end()).to.emit(auctionImplementation, "End");
         });
 
         it("Highest bidder in your case should be bidder 3", async () => {
-
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+            expect(await auctionImplementation.highestBidder()).to.eq(bidder3.address);
         });
 
         it("Highest bid should be in our case 350", async () => {
-
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+            const highestBidBn = await auctionImplementation.highestBid();
+            const highestBid = ethers.utils.formatEther(highestBidBn);
+            expect(highestBid).to.eq("350.0");
         });
 
         it("Not highest bidders can withdraw and re-bid if want to", async () => {
-
+            const bidder1NewAmount = "550";
+            await network.provider.send("evm_increaseTime", [60]);
+            await network.provider.send("evm_mine");
+            const withdrawTx1 = await auctionImplementation.connect(bidder1).withdraw();
+            await withdrawTx1.wait();
+            const reBidTx = await auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidder1NewAmount));
+            await network.provider.send("evm_increaseTime", [60]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+            const highestBidBn = await auctionImplementation.highestBid();
+            const highestBid = ethers.utils.formatEther(highestBidBn);
+            expect(highestBid).to.eq("550.0");
+            expect(await auctionImplementation.highestBidder()).to.eq(bidder1.address);
         });
 
         it("Should transfer NFT carbon certificate to the highest bidder", async () => {
