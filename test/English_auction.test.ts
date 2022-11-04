@@ -224,6 +224,7 @@ describe("English Auction for tokenized carbon credits", function () {
             const withdrawTx1 = await auctionImplementation.connect(bidder1).withdraw();
             await withdrawTx1.wait();
             const reBidTx = await auctionImplementation.connect(bidder1).bid(ethers.utils.parseEther(bidder1NewAmount));
+            await reBidTx.wait();
             await network.provider.send("evm_increaseTime", [60]);
             await network.provider.send("evm_mine");
             const endTx1 = await auctionImplementation.end();
@@ -235,7 +236,12 @@ describe("English Auction for tokenized carbon credits", function () {
         });
 
         it("Should transfer NFT carbon certificate to the highest bidder", async () => {
-
+            await network.provider.send("evm_increaseTime", [130]);
+            await network.provider.send("evm_mine");
+            const endTx1 = await auctionImplementation.end();
+            await endTx1.wait();
+            const newOwner = await nft.ownerOf(0);
+            expect(newOwner).to.eq(bidder3.address);
         });
 
         it("Should transfer funds to the seller of the NFT carbon certificate", async () => {
