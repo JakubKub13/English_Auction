@@ -20,6 +20,12 @@ export const networkConfig: networkConfigInfo = {
         auctionImplementation: "",
     },
 
+    80001: {
+        name: "mumbai",
+        auctionFactory: "",
+        auctionImplementation: "",
+    },
+
     1: {
         name: "mainnet",
         auctionFactory: "",
