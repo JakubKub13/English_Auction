@@ -457,4 +457,16 @@ describe("English Auction for tokenized carbon credits", function () {
             expect(highestBid).to.eq("600.0");
         });
     });
+
+    describe("Transfer ownership of autionFactory", function() {
+        it("Should transfer ownership of auction factory to new owner only from owner account", async () => {
+            const newOwner = bidder1.address;
+            const transferOwnerShip = await auctionFactory.transferOwnership(newOwner);
+            expect(await auctionFactory.owner()).to.eq(bidder1.address);
+        });
+
+        it("Should not be able to transfer ownership from not an owner account", async () => {
+            await expect(auctionFactory.connect(bidder1).transferOwnership(bidder1.address)).to.be.revertedWith("Ownable: caller is not the owner")
+        });
+    });
 });
