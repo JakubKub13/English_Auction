@@ -15,7 +15,7 @@ export const networkConfig: networkConfigInfo = {
     31337: {
         name: "localhost",
         auctionFactory: "",
-        auctionImplementation: "",
+        auctionImplementation1: "",
         mDAI: "",
         NFT: "",
     },
@@ -23,7 +23,7 @@ export const networkConfig: networkConfigInfo = {
     5: {
         name: "goerli",
         auctionFactory: "",
-        auctionImplementation: "",
+        auctionImplementation1: "",
         mDAI: "",
         NFT: "",
     },
@@ -41,7 +41,7 @@ export const networkConfig: networkConfigInfo = {
     1: {
         name: "mainnet",
         auctionFactory: "",
-        auctionImplementation: "",
+        auctionImplementation1: "",
         mDAI: "",
         NFT: "",
     },
