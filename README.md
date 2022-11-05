@@ -24,6 +24,6 @@ English Auction Implementation can be in one of following states during it's lif
 1. NOT STARTED (Seller has not started auction, _timeInverval in seconds is not provided, Bids are unavailable)
 2. STARTED (Seller starts the auction, set time when auction expires, Users can bid on the NFT)
 3. EXPIRED (Before seller calls the end() function, Bids are unavailable)
-4. ENDED (Seller calls end() function, The transfers of NFT to the highestBidder and chosen token amount as highestBid to the seller are settled)
+4. ENDED (Seller calls end() function (Will use chainlink automation in v2), The transfers of NFT to the highestBidder and chosen token amount as highestBid to the seller are settled)
 
 Bidder can bid again if his bid is not currently the highestBid by withdrawing the previous amount of tokens and bid with new amount.
