@@ -1,4 +1,4 @@
-import { ethers, network } from "hardhat";
+import { ethers } from "hardhat";
 import * as dotenv from "dotenv";
 import { MockDAI } from "../typechain-types";
 dotenv.config();
