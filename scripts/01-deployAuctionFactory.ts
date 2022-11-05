@@ -12,8 +12,8 @@ async function main() {
         ethers.utils.parseEther(FACTORY_FEE_FOR_CREATING_AUCTION.toFixed(18))
     );
     await auctionFactory.deployed();
-
     console.log(`Auction Factory was deployed at this address: ${auctionFactory.address}`);
+    
 }
 
 main().catch((error) => {
