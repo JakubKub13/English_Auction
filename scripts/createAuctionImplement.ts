@@ -9,8 +9,6 @@ dotenv.config();
 const STARTING_BID: Number = 500; // DAI
 const FACTORY_FEE: Number = 0.03; // ETH or Matic
 
-let mDAI: MockDAI;
-let carbonCredNFT: NFTAuction;
 let auctionFactory: AuctionFactory
 let account1: ethers.Wallet;
 let account2: ethers.Wallet;
