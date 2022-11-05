@@ -16,14 +16,11 @@ let provider: ethers.providers.JsonRpcProvider;
 const DAI_AMOUNT_TO_MINT = 1000;
 
 async function main() {
-    const provider = new ethers.providers.JsonRpcProvider(process.env.MUMBAI_RPC_URL);
+    provider = new ethers.providers.JsonRpcProvider(process.env.MUMBAI_RPC_URL);
     const privateKey1 = process.env.PRIVATE_KEY;
     const privateKey2 = process.env.PRIVATE_KEY2;
     const privateKey3 = process.env.PRIVATE_KEY3;
     const privateKey4 = process.env.PRIVATE_KEY4;
-
-    let mockedDAI: MockDAI;
-
     const chainId = network.config.chainId;
     const mDAIAddr = networkConfig[chainId]["mDAI"];
     const mDAI_ABI = [
