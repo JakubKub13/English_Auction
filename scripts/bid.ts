@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { network } from "hardhat";
 import * as dotenv from "dotenv";
-import { EnglishAuction, MockDAI, NFTAuction } from "../typechain-types"; 
+import { EnglishAuction, MockDAI } from "../typechain-types"; 
 import * as auctionImplementationJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
 import * as mockDaiJSON from '../artifacts/contracts/mockDAI.sol/MockDAI.json';
 import { networkConfig } from "../helper-hardhat-config";
@@ -50,7 +50,7 @@ async function main() {
   await bidAcc2Tx.wait();
 
   console.log(`The first bidder: ${account2.address} has bidded with amount of ${FIRST_BID} DAIs`);
-  console.log(`The second bidder: ${account3.address} has bidded with amount of ${FIRST_BID} DAIs`);
+  console.log(`The second bidder: ${account3.address} has bidded with amount of ${SECOND_BID} DAIs`);
 }
 
 main().catch((error) => {

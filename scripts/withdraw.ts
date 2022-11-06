@@ -13,12 +13,13 @@ let provider: ethers.providers.JsonRpcProvider;
 
 async function main() {
   provider = new ethers.providers.JsonRpcProvider(process.env.MUMBAI_RPC_URL);
-  const privateKey2 = process.env.PRIVATE_KEY2;
+  const privateKey3 = process.env.PRIVATE_KEY2;
   const chainId = network.config.chainId;
   const auctionImplementationAddr = networkConfig[chainId]["auctionImplementation1"];
   const auctionImplementation_ABI = auctionImplementationJSON.abi;
 
   auctionImplementation = new ethers.Contract(auctionImplementationAddr, auctionImplementation_ABI, provider) as EnglishAuction;
+  account2 = new ethers.Wallet(privateKey3, provider);
 
   const withdrawTX = await auctionImplementation.connect(account2).withdraw();
   await withdrawTX.wait();
