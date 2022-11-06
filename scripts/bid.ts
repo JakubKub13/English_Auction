@@ -9,9 +9,8 @@ import { networkConfig } from "../helper-hardhat-config";
 
 dotenv.config();
 
-const FIRST_BID = 600;
-const SECOND_BID = 1000;
-const THIRD_BID = 2500;
+const FIRST_BID = "600";
+const SECOND_BID = "1000";
 
 let carbonNFT: NFTAuction;
 let auctionImplementation: EnglishAuction
@@ -37,8 +36,26 @@ async function main() {
   carbonNFT = new ethers.Contract(NFTAddr, NFT_ABI, provider) as NFTAuction;
   mDAI = new ethers.Contract(mDAIAddr, mDAI_ABI, provider) as MockDAI;
   auctionImplementation = new ethers.Contract(auctionImplementationAddr, auctionImplementation_ABI, provider) as EnglishAuction;
-  
 
+  seller = new ethers.Wallet(privateKey2, provider);
+  account2 = new ethers.Wallet(privateKey3, provider);
+  account3 = new ethers.Wallet(privateKey4, provider);
+
+  const balanceOfAcc1 = await mDAI.connect(account2).balanceOf(account2.address);
+  const balanceOfAcc2 = await mDAI.connect(account3).balanceOf(account3.address);
+
+  const approveTx1 = await mDAI.connect(account2).approve(auctionImplementation.address, balanceOfAcc1);
+  await approveTx1.wait();
+  const approveTx2 = await mDAI.connect(account3).approve(auctionImplementation.address, balanceOfAcc2);
+  await approveTx2.wait();
+
+  const bidAcc1TX = await auctionImplementation.connect(account2).bid(ethers.utils.parseEther(FIRST_BID));
+  await bidAcc1TX.wait();
+  const bidAcc2Tx = await auctionImplementation.connect(account3).bid(ethers.utils.parseEther(SECOND_BID));
+  await bidAcc2Tx.wait();
+
+  console.log(`The first bidder: ${account2.address} has bidded with amount of ${FIRST_BID} DAIs`);
+  console.log(`The second bidder: ${account3.address} has bidded with amount of ${FIRST_BID} DAIs`);
 }
 
 main().catch((error) => {
