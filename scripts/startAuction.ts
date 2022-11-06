@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { network } from "hardhat";
 import * as dotenv from "dotenv";
 import { EnglishAuction, NFTAuction } from "../typechain-types"; 
-import * as nftContractJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
+import * as nftContractJSON from '../artifacts/contracts/NFT.sol/NFTAuction.json';
 import * as auctionImplementationJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
 import { networkConfig } from "../helper-hardhat-config";
 

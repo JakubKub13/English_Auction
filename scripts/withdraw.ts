@@ -20,10 +20,10 @@ async function main() {
 
   auctionImplementation = new ethers.Contract(auctionImplementationAddr, auctionImplementation_ABI, provider) as EnglishAuction;
 
-  const withdrawTX = await auctionImplementation.
+  const withdrawTX = await auctionImplementation.connect(account2).withdraw();
+  await withdrawTX.wait();
 
-
-
+  console.log(`Account with address: ${account2.address} has successfully withdrew his DAIs check you wallet`);
 }
 
 main().catch((error) => {
