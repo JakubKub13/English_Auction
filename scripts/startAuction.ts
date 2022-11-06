@@ -8,7 +8,7 @@ import { networkConfig } from "../helper-hardhat-config";
 
 dotenv.config();
 
-const DURATION_OF_AUCTION_IN_SEC = 60 // 1 minute
+const DURATION_OF_AUCTION_IN_SEC = 300 // 5 minutes
 
 let carbonNFT: NFTAuction;
 let auctionImplementation: EnglishAuction
