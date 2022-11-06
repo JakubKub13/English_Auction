@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { network } from "hardhat";
 import * as dotenv from "dotenv";
-import { EnglishAuction, MockDAI, NFTAuction } from "../typechain-types"; 
+import { EnglishAuction } from "../typechain-types"; 
 import * as auctionImplementationJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
 import { networkConfig } from "../helper-hardhat-config";
 
@@ -13,7 +13,7 @@ let provider: ethers.providers.JsonRpcProvider;
 
 async function main() {
   provider = new ethers.providers.JsonRpcProvider(process.env.MUMBAI_RPC_URL);
-  const privateKey3 = process.env.PRIVATE_KEY2;
+  const privateKey3 = process.env.PRIVATE_KEY3;
   const chainId = network.config.chainId;
   const auctionImplementationAddr = networkConfig[chainId]["auctionImplementation1"];
   const auctionImplementation_ABI = auctionImplementationJSON.abi;
