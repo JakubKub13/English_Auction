@@ -3,7 +3,7 @@ import { network } from "hardhat";
 import * as dotenv from "dotenv";
 import { EnglishAuction, NFTAuction } from "../typechain-types"; 
 import * as nftContractJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
-import * as auctionFactoryJSON from '../artifacts/contracts/AuctionFactory.sol/AuctionFactory.json';
+import * as auctionImplementationJSON from '../artifacts/contracts/EnglishAuction.sol/EnglishAuction.json';
 import { networkConfig } from "../helper-hardhat-config";
 
 dotenv.config();
@@ -27,7 +27,7 @@ async function main() {
   const NFTAddr = networkConfig[chainId]["NFT"];
   const NFT_ABI = nftContractJSON.abi;
   const auctionImplementationAddr = networkConfig[chainId]["auctionImplementation1"];
-  const auctionImplementation_ABI = auctionFactoryJSON.abi;
+  const auctionImplementation_ABI = auctionImplementationJSON.abi;
 
   carbonNFT = new ethers.Contract(NFTAddr, NFT_ABI, provider) as NFTAuction;
   auctionImplementation = new ethers.Contract(auctionImplementationAddr, auctionImplementation_ABI, provider) as EnglishAuction;
